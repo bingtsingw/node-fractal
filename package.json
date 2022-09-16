@@ -93,5 +93,8 @@
       "alloy",
       "alloy/typescript"
     ]
+  },
+  "dependencies": {
+    "lodash.isempty": "^4.4.0"
   }
 }

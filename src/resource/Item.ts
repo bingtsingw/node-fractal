@@ -1,3 +1,3 @@
 import { ResourceAbstract } from './abstract';
 
-export class ResourceItem<T> extends ResourceAbstract<T> {}
+export class ItemResource<T> extends ResourceAbstract<T> {}
