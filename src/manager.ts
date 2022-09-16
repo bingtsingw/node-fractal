@@ -1,6 +1,6 @@
 import { ResourceInterface } from './resource/interface';
 
-export default class Manager {
+export class Manager {
   private resource: ResourceInterface;
 
   public createData(resource: ResourceInterface) {
