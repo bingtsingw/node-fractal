@@ -4,12 +4,12 @@ type Transformer<T> = (data: T) => any;
 type Meta = Record<string, any>;
 
 export abstract class ResourceAbstract<T extends Record<string, any>> implements ResourceInterface {
-  protected data: T;
+  protected data: T | T[];
   protected meta: Meta = {};
   protected resourceKey: string;
   protected transformer: Transformer<T>;
 
-  public constructor(data: T, transformer: Transformer<T>, resourceKey = '') {
+  public constructor(data: T | T[], transformer: Transformer<T>, resourceKey = '') {
     this.data = data;
     this.transformer = transformer;
     this.resourceKey = resourceKey;
