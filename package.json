@@ -1,6 +1,6 @@
 {
   "name": "node-fractal",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "Output complex, flexible, AJAX/RESTful data structures.",
   "main": "dist/manager.js",
   "scripts": {
