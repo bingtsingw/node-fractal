@@ -1,4 +1,4 @@
-import isEmpty from 'lodash.isempty';
+import { isEmpty } from 'lodash';
 import { SerializerInterface } from './interface';
 
 export class DataSerializer implements SerializerInterface {
