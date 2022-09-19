@@ -5,7 +5,31 @@ import { DataSerializer } from './serializer/data';
 import { SerializerInterface } from './serializer/interface';
 
 export class Manager {
-  private resource: ResourceInterface;
+  protected resource: ResourceInterface;
+
+  protected recursionLimit = 10;
+
+  protected serializer: SerializerInterface = new DataSerializer();
+
+  public getRecursionLimit(): number {
+    return this.recursionLimit;
+  }
+
+  public setRecursionLimit(recursionLimit: number): this {
+    this.recursionLimit = recursionLimit;
+
+    return this;
+  }
+
+  public getSerializer(): SerializerInterface {
+    return this.serializer;
+  }
+
+  public setSerializer(serializer: SerializerInterface): this {
+    this.serializer = serializer;
+
+    return this;
+  }
 
   public createData(resource: ResourceInterface) {
     this.resource = resource;
@@ -14,7 +38,7 @@ export class Manager {
   }
 
   public toObject() {
-    const serializer = new DataSerializer();
+    const serializer = this.getSerializer();
     const rawData = this.executeResourceTransformers();
 
     const data = this.serializeResourceData(serializer, rawData);
