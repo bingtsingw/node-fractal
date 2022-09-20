@@ -1,4 +1,5 @@
 import { CollectionResource, ItemResource, Manager, ResourceInterface, SerializerInterface } from '.';
+import { TransformerAbstract } from './transformer';
 
 export class Scope {
   protected manager: Manager;
@@ -46,10 +47,17 @@ export class Scope {
     return parts.filter((v) => v !== null).join(',');
   }
 
-  public toObject() {
-    const serializer = this.manager.getSerializer();
+  /**
+   * Embed a scope as a child of the current scope.
+   */
+  public embedChildScope(scopeIdentifier: string, resource: ResourceInterface): Scope {
+    return this.manager.createData(resource, scopeIdentifier, this);
+  }
 
+  public toObject() {
     const rawData = this.executeResourceTransformers();
+
+    const serializer = this.manager.getSerializer();
 
     const data = this.serializeResourceData(serializer, rawData);
 
@@ -58,16 +66,16 @@ export class Scope {
     return { ...data, ...meta };
   }
 
-  protected executeResourceTransformers() {
+  private executeResourceTransformers() {
     const transformer = this.resource.getTransformer();
     const data = this.resource.getData();
 
     if (this.resource instanceof ItemResource) {
-      return transformer(data);
+      return this.fireTransformer(transformer, data);
     } else if (this.resource instanceof CollectionResource) {
       const ret = [];
       for (let value of data) {
-        ret.push(transformer(value));
+        ret.push(this.fireTransformer(transformer, value));
       }
       return ret;
     } else {
@@ -75,7 +83,25 @@ export class Scope {
     }
   }
 
-  protected serializeResourceData(serializer: SerializerInterface, data: any) {
+  private fireTransformer(transformer, data) {
+    let transformedData = {};
+    let includedData = {};
+
+    if (transformer instanceof TransformerAbstract) {
+      transformer.setCurrentScope(this);
+      transformedData = transformer.transform(data);
+
+      includedData = transformer.processIncludedResources(this, data);
+
+      transformedData = this.manager.getSerializer().mergeIncludes(transformedData, includedData);
+    } else if (typeof transformer === 'function') {
+      transformedData = transformer(data);
+    }
+
+    return transformedData;
+  }
+
+  private serializeResourceData(serializer: SerializerInterface, data: any) {
     const resourceKey = this.resource.getResourceKey();
 
     if (this.resource instanceof CollectionResource) {
@@ -89,7 +115,7 @@ export class Scope {
     return serializer.null();
   }
 
-  protected serializeResourceMeta(serializer: SerializerInterface) {
+  private serializeResourceMeta(serializer: SerializerInterface) {
     return serializer.meta(this.resource.getMeta());
   }
 }
